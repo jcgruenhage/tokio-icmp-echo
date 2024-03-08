@@ -1,4 +1,5 @@
 use std::io;
+use std::num::NonZeroU32;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
@@ -16,8 +17,13 @@ pub struct Socket {
 }
 
 impl Socket {
-    pub fn new(domain: Domain, type_: Type, protocol: Protocol) -> io::Result<Self> {
-        let socket = mio::Socket::new(domain, type_, protocol)?;
+    pub fn new(
+        domain: Domain,
+        type_: Type,
+        protocol: Protocol,
+        interface: Option<NonZeroU32>,
+    ) -> io::Result<Self> {
+        let socket = mio::Socket::new(domain, type_, protocol, interface)?;
         let socket = AsyncFd::new(socket)?;
         Ok(Self {
             socket: Arc::new(socket),

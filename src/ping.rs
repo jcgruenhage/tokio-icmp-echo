@@ -2,6 +2,7 @@ use std::io;
 
 use std::collections::HashMap;
 use std::net::{IpAddr, SocketAddr};
+use std::num::NonZeroU32;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
@@ -253,9 +254,9 @@ enum Sockets {
 }
 
 impl Sockets {
-    fn new() -> io::Result<Self> {
-        let mb_v4socket = Socket::new(Domain::IPV4, Type::RAW, Protocol::ICMPV4);
-        let mb_v6socket = Socket::new(Domain::IPV6, Type::RAW, Protocol::ICMPV6);
+    fn new(interface: Option<NonZeroU32>) -> io::Result<Self> {
+        let mb_v4socket = Socket::new(Domain::IPV4, Type::RAW, Protocol::ICMPV4, interface);
+        let mb_v6socket = Socket::new(Domain::IPV6, Type::RAW, Protocol::ICMPV6, interface);
         match (mb_v4socket, mb_v6socket) {
             (Ok(v4_socket), Ok(v6_socket)) => Ok(Sockets::Both {
                 v4: v4_socket,
@@ -286,8 +287,8 @@ impl Sockets {
 
 impl Pinger {
     /// Create new `Pinger` instance, will fail if unable to create both IPv4 and IPv6 sockets.
-    pub async fn new() -> Result<Self, Error> {
-        let sockets = Sockets::new()?;
+    pub async fn new(interface: Option<NonZeroU32>) -> Result<Self, Error> {
+        let sockets = Sockets::new(interface)?;
 
         let state = PingState::new();
 

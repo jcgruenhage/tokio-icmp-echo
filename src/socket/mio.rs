@@ -1,5 +1,6 @@
 use std::io;
 
+use std::num::NonZeroU32;
 use std::os::unix::io::{AsRawFd, RawFd};
 
 use std::io::Read;
@@ -13,8 +14,19 @@ pub struct Socket {
 }
 
 impl Socket {
-    pub fn new(domain: Domain, type_: Type, protocol: Protocol) -> io::Result<Self> {
+    pub fn new(
+        domain: Domain,
+        type_: Type,
+        protocol: Protocol,
+        interface: Option<NonZeroU32>,
+    ) -> io::Result<Self> {
         let socket = Socket2::new(domain, type_, Some(protocol))?;
+        if domain == Domain::IPV4 {
+            socket.bind_device_by_index_v4(interface)?;
+        }
+        if domain == Domain::IPV6 {
+            socket.bind_device_by_index_v6(interface)?;
+        }
         socket.set_nonblocking(true)?;
 
         Ok(Self { socket })
