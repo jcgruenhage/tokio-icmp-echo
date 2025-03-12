@@ -40,7 +40,7 @@ pub struct EchoRequest<'a> {
     pub payload: &'a [u8],
 }
 
-impl<'a> EchoRequest<'a> {
+impl EchoRequest<'_> {
     pub fn encode<P: Proto>(&self, buffer: &mut [u8]) -> Result<(), Error> {
         buffer[0] = P::ECHO_REQUEST_TYPE;
         buffer[1] = P::ECHO_REQUEST_CODE;
