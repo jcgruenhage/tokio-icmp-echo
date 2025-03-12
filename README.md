@@ -4,6 +4,8 @@
 
 tokio-icmp-echo is an asynchronous ICMP pinging library. It was originally written by Fedor Gogolev, a.k.a. knsd, and distributed under the name tokio-ping. This here is a fork that includes mostly maintenance work, to make sure it works in the current state of the async rust ecosystem.
 
+The minimum supported rust version is `1.70.0`
+
 # Usage example
 
 Note, sending and receiving ICMP packets requires privileges.
