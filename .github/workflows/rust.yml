@@ -12,6 +12,7 @@ jobs:
           - ubuntu-latest
           - macOS-latest
         rust:
+          - 1.70.0
           - stable
           - beta
           - nightly
