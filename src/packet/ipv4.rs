@@ -20,7 +20,7 @@ pub enum IpV4Protocol {
 impl IpV4Protocol {
     fn decode(data: u8) -> Option<Self> {
         match data {
-            1 => Some(IpV4Protocol::Icmp),
+            1 => Some(Self::Icmp),
             _ => None,
         }
     }

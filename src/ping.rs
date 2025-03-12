@@ -257,29 +257,29 @@ impl Sockets {
         let mb_v4socket = Socket::new(Domain::IPV4, Type::RAW, Protocol::ICMPV4);
         let mb_v6socket = Socket::new(Domain::IPV6, Type::RAW, Protocol::ICMPV6);
         match (mb_v4socket, mb_v6socket) {
-            (Ok(v4_socket), Ok(v6_socket)) => Ok(Sockets::Both {
+            (Ok(v4_socket), Ok(v6_socket)) => Ok(Self::Both {
                 v4: v4_socket,
                 v6: v6_socket,
             }),
-            (Ok(v4_socket), Err(_)) => Ok(Sockets::V4(v4_socket)),
-            (Err(_), Ok(v6_socket)) => Ok(Sockets::V6(v6_socket)),
+            (Ok(v4_socket), Err(_)) => Ok(Self::V4(v4_socket)),
+            (Err(_), Ok(v6_socket)) => Ok(Self::V6(v6_socket)),
             (Err(err), Err(_)) => Err(err),
         }
     }
 
     fn v4(&self) -> Option<&Socket> {
         match *self {
-            Sockets::V4(ref socket) => Some(socket),
-            Sockets::Both { ref v4, .. } => Some(v4),
-            Sockets::V6(_) => None,
+            Self::V4(ref socket) => Some(socket),
+            Self::Both { ref v4, .. } => Some(v4),
+            Self::V6(_) => None,
         }
     }
 
     fn v6(&self) -> Option<&Socket> {
         match *self {
-            Sockets::V4(_) => None,
-            Sockets::Both { ref v6, .. } => Some(v6),
-            Sockets::V6(ref socket) => Some(socket),
+            Self::V4(_) => None,
+            Self::Both { ref v6, .. } => Some(v6),
+            Self::V6(ref socket) => Some(socket),
         }
     }
 }
@@ -411,7 +411,7 @@ impl ParseReply for IcmpV4 {
                 return None;
             }
 
-            if let Ok(reply) = EchoReply::decode::<IcmpV4>(ipv4_packet.data) {
+            if let Ok(reply) = EchoReply::decode::<Self>(ipv4_packet.data) {
                 return Some(reply.payload);
             }
         }
@@ -421,7 +421,7 @@ impl ParseReply for IcmpV4 {
 
 impl ParseReply for IcmpV6 {
     fn reply_payload(data: &[u8]) -> Option<&[u8]> {
-        if let Ok(reply) = EchoReply::decode::<IcmpV6>(data) {
+        if let Ok(reply) = EchoReply::decode::<Self>(data) {
             return Some(reply.payload);
         }
         None
