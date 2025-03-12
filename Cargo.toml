@@ -12,10 +12,9 @@ edition = "2021"
 
 [dependencies]
 futures = "0.3"
-libc = "0.2"
 mio = { version = "1.0", features = ["os-ext"] }
 rand = "0.9"
-socket2 = { version = "0.5", features = ["all"] }
+socket2 = "0.5"
 tokio = { version = "1", features = ["rt", "time", "net"] }
 parking_lot = "0.12"
 thiserror = "2"
