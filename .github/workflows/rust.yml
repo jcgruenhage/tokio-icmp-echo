@@ -12,7 +12,7 @@ jobs:
           - ubuntu-latest
           - macOS-latest
         rust:
-          - stable
+          - 1.70.0
           - beta
           - nightly
     steps:
