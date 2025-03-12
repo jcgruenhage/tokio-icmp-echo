@@ -59,6 +59,7 @@ impl EchoRequest<'_> {
     }
 }
 
+#[allow(dead_code)]
 pub struct EchoReply<'a> {
     pub ident: u16,
     pub seq_cnt: u16,
