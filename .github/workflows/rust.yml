@@ -36,6 +36,9 @@ jobs:
         with:
           command: test
 
+      - name: Install clippy component
+        run: rustup component add clippy --toolchain ${{ matrix.rust }}
+
       - name: Run cargo clippy
         uses: actions-rs/cargo@v1
         with:
