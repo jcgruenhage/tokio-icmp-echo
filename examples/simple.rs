@@ -9,7 +9,7 @@ use crate::futures::{future, StreamExt};
 async fn main() {
     let addr = std::env::args().nth(1).unwrap().parse().unwrap();
 
-    let pinger = tokio_icmp_echo::Pinger::new().await.unwrap();
+    let pinger = tokio_icmp_echo::Pinger::new().unwrap();
     let stream = pinger.chain(addr).stream();
     stream
         .take(3)
