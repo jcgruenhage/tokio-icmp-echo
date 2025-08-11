@@ -286,7 +286,7 @@ impl Sockets {
 
 impl Pinger {
     /// Create new `Pinger` instance, will fail if unable to create both IPv4 and IPv6 sockets.
-    pub async fn new() -> Result<Self, Error> {
+    pub fn new() -> Result<Self, Error> {
         let sockets = Sockets::new()?;
 
         let state = PingState::new();
