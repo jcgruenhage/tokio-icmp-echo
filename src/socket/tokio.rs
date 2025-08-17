@@ -3,21 +3,21 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
 
-use socket2::{Domain, Protocol, SockAddr, Type};
+use socket2::{Domain, Protocol, SockAddr, Socket as Socket2, Type};
 use std::future::Future;
+use std::io::Read;
 use std::net::SocketAddr;
 use tokio::io::unix::AsyncFd;
 
-use super::mio;
-
 #[derive(Clone)]
 pub struct Socket {
-    socket: Arc<AsyncFd<mio::Socket>>,
+    socket: Arc<AsyncFd<Socket2>>,
 }
 
 impl Socket {
     pub fn new(domain: Domain, type_: Type, protocol: Protocol) -> io::Result<Self> {
-        let socket = mio::Socket::new(domain, type_, protocol)?;
+        let socket = Socket2::new(domain, type_, Some(protocol))?;
+        socket.set_nonblocking(true)?;
         let socket = AsyncFd::new(socket)?;
         Ok(Self {
             socket: Arc::new(socket),
@@ -40,7 +40,7 @@ impl Socket {
     pub fn recv(&self, buffer: &mut [u8], cx: &mut Context<'_>) -> Poll<Result<usize, io::Error>> {
         loop {
             match self.socket.poll_read_ready(cx) {
-                Poll::Ready(Ok(mut guard)) => match guard.try_io(|fd| fd.get_ref().recv(buffer)) {
+                Poll::Ready(Ok(mut guard)) => match guard.try_io(|fd| fd.get_ref().read(buffer)) {
                     Ok(res) => return Poll::Ready(res),
                     Err(_) => continue,
                 },
@@ -57,7 +57,7 @@ pub struct Send<T> {
 
 enum SendState<T> {
     Writing {
-        socket: Arc<AsyncFd<mio::Socket>>,
+        socket: Arc<AsyncFd<Socket2>>,
         buf: T,
         addr: SockAddr,
     },
@@ -65,7 +65,7 @@ enum SendState<T> {
 }
 
 fn send_to(
-    socket: &Arc<AsyncFd<mio::Socket>>,
+    socket: &Arc<AsyncFd<Socket2>>,
     buf: &[u8],
     target: &SockAddr,
     cx: &mut Context<'_>,
